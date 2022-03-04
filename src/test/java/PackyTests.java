@@ -7,6 +7,7 @@ public class PackyTests {
     @Test
     public void createTestServer() {
         PackyServer server = Packy.createServer(25565);
+        server.sendPacket(new TestPacket());
     }
 
 }
