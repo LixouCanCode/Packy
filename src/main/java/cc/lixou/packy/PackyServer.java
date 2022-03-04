@@ -1,12 +1,8 @@
 package cc.lixou.packy;
 
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 public class PackyServer {
 
     private final ServerSocket serverSocket;
@@ -23,5 +19,11 @@ public class PackyServer {
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         inputStream = new ObjectInputStream(socket.getInputStream());
     }
+
+    public void sendPacket(Packet packet) {
+        PackyBuffer buffer = new PackyBuffer();
+        packet.write(buffer);
+        System.out.println(buffer.result());
+   }
 
 }
