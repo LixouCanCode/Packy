@@ -4,6 +4,6 @@ public interface Packet {
 
     void write(PackyBuffer buffer);
 
-    Packet read(PackyBuffer buffer);
+    PackyBuffer read(PackyBuffer buffer);
 
 }

@@ -12,7 +12,7 @@ public class TestPacket implements Packet {
     }
 
     @Override
-    public Packet read(PackyBuffer buffer) {
+    public PackyBuffer read(PackyBuffer buffer) {
         return null;
     }
 

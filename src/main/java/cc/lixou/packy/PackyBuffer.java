@@ -3,23 +3,37 @@ package cc.lixou.packy;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 public class PackyBuffer {
 
-    private ByteArrayOutputStream outputStream;
+    private byte[] bytes;
 
-    public PackyBuffer() {
-        outputStream = new ByteArrayOutputStream();
+    private ByteArrayOutputStream outputStream;
+    private ByteArrayInputStream inputStream;
+
+    public PackyBuffer(byte[] bytes) {
+        this.bytes = bytes;
+    }
+
+    public ByteArrayOutputStream requireOutputStream() {
+        if(outputStream == null) { outputStream = new ByteArrayOutputStream(); }
+        return outputStream;
+    }
+    public ByteArrayInputStream requireInputStream() {
+        if(inputStream == null) { inputStream = new ByteArrayInputStream(bytes); }
+        return inputStream;
     }
 
     /* == WRITE == */
     public PackyBuffer write(Serializable serializable) { writeBytes(SerializationUtils.serialize(serializable)); return this; }
 
     @SneakyThrows
-    public PackyBuffer writeBytes(byte[] bytes) { outputStream.write(bytes); return this; }
+    public PackyBuffer writeBytes(byte[] bytes) { requireOutputStream().write(bytes); return this; }
     public PackyBuffer writeByte(byte b) { write(b); return this; }
     public PackyBuffer writeBoolean(boolean b) { write(b); return this; }
     public PackyBuffer writeShort(short s) { write(s); return this; }
@@ -30,11 +44,24 @@ public class PackyBuffer {
     public PackyBuffer writeChar(char c) { write(c); return this; }
     public PackyBuffer writeString(String s) { write(s.getBytes(StandardCharsets.UTF_8)); return this; }
 
+    /* == READ == */
     @SneakyThrows
-    public String result() {
-        String result = outputStream.toString();
+    public byte[] readNBytes(int length) { return requireInputStream().readNBytes(length); }
+    public byte[] readAll() { return requireInputStream().readAllBytes(); }
+
+    @SneakyThrows
+    public boolean readBoolean() {
+        System.out.println(Arrays.toString(requireInputStream().readNBytes(1)));
+        return false;
+    }
+
+    @SneakyThrows
+    public byte[] result() {
+        if(outputStream == null) { return new byte[0]; }
+        byte[] result = outputStream.toByteArray();
         outputStream.flush();
         outputStream.close();
+        if(inputStream != null) { inputStream.close(); }
         return result;
     }
 

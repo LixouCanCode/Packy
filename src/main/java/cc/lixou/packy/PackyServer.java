@@ -3,6 +3,8 @@ package cc.lixou.packy;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
+
 public class PackyServer {
 
     private final ServerSocket serverSocket;
@@ -21,9 +23,10 @@ public class PackyServer {
     }
 
     public void sendPacket(Packet packet) {
-        PackyBuffer buffer = new PackyBuffer();
+        PackyBuffer buffer = new PackyBuffer(null);
         packet.write(buffer);
-        System.out.println(buffer.result());
+        PackyBuffer buffer1 = new PackyBuffer(packet.read(buffer).result());
+        buffer1.readBoolean();
    }
 
 }
