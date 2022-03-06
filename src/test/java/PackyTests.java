@@ -1,11 +1,9 @@
 import cc.lixou.packy.Packy;
 import cc.lixou.packy.PackyServer;
-import org.junit.jupiter.api.Test;
 
 public class PackyTests {
 
-    @Test
-    public void createTestServer() {
+    public static void main(String[] args) {
         PackyServer server = Packy.createServer(25565);
         server.sendPacket(new TestPacket());
     }

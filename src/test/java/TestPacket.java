@@ -5,6 +5,7 @@ public class TestPacket implements Packet {
 
     @Override
     public void write(PackyBuffer buffer) {
+        buffer.writeBoolean(false);
         buffer.writeInt(123);
         buffer.writeString("Test");
         buffer.writeByte((byte) 4);
@@ -12,8 +13,8 @@ public class TestPacket implements Packet {
     }
 
     @Override
-    public PackyBuffer read(PackyBuffer buffer) {
-        return null;
+    public void read(PackyBuffer buffer) {
+
     }
 
 }

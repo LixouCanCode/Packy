@@ -18,15 +18,16 @@ public class PackyServer {
 
     public void start() throws IOException {
         Socket socket = serverSocket.accept();
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-        inputStream = new ObjectInputStream(socket.getInputStream());
+        //outputStream = new ObjectOutputStream(socket.getOutputStream());
+        //inputStream = new ObjectInputStream(socket.getInputStream());
     }
 
     public void sendPacket(Packet packet) {
         PackyBuffer buffer = new PackyBuffer(null);
         packet.write(buffer);
-        PackyBuffer buffer1 = new PackyBuffer(packet.read(buffer).result());
-        buffer1.readBoolean();
+        PackyBuffer buffer1 = new PackyBuffer(buffer.result());
+        buffer.close();
+        System.out.println(buffer1.readBoolean());
    }
 
 }
