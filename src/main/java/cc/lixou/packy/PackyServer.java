@@ -3,13 +3,15 @@ package cc.lixou.packy;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -20,8 +22,13 @@ public class PackyServer {
     private final Selector selector;
     private final ServerSocketChannel serverSocket;
 
-    @Getter private final List<PackyWorker> workers;
-    @Getter private final AtomicInteger workerSize = new AtomicInteger(0);
+    @Getter
+    private final List<PackyWorker> workers;
+    @Getter
+    private final AtomicInteger workerCount = new AtomicInteger(0);
+
+    @Getter
+    private boolean open = false;
 
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -40,6 +47,26 @@ public class PackyServer {
         for (PackyWorker worker : workers) {
             worker.start();
         }
+        this.open = true;
+        new Thread(() -> {
+            while (isOpen()) {
+                try {
+                    this.selector.select(selectionKey -> {
+                        if (!selectionKey.isAcceptable()) {
+                            return;
+                        }
+                        try {
+                            SocketChannel channel = serverSocket.accept();
+                            findWorker().addChannel(channel);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, "PackyServer").start();
         //outputStream = new ObjectOutputStream(socket.getOutputStream());
         //inputStream = new ObjectInputStream(socket.getInputStream());
     }
@@ -58,6 +85,13 @@ public class PackyServer {
         buffer.close();
         packet.read(new PackyBuffer(result));
         // TODO: Send Bytes
+    }
+
+    private int findWorkerIndex;
+
+    private PackyWorker findWorker() {
+        this.findWorkerIndex = ++findWorkerIndex % getWorkerCount().get();
+        return getWorkers().get(findWorkerIndex);
     }
 
 }
