@@ -34,6 +34,14 @@ public class PackyWorker extends Thread {
         this.selector.wakeup();
     }
 
+    @SneakyThrows
+    public void disconnectChannel(SocketChannel channel) {
+        System.out.println("disconnected " + channel.getRemoteAddress());
+        channel.close();
+        channels.remove(channel);
+        this.selector.wakeup();
+    }
+
     @Override
     public void run() {
         System.out.println("[Worker-" + ID + "] Starting..");
@@ -43,7 +51,10 @@ public class PackyWorker extends Thread {
                     final SocketChannel channel = (SocketChannel) selectionKey.channel();
                     if (!channel.isOpen()) return;
                     if (!selectionKey.isReadable()) return;
-                    channels.get(channel).handle();
+                    boolean couldHandle = channels.get(channel).handle();
+                    if(!couldHandle) {
+                        disconnectChannel(channel);
+                    }
                 });
             } catch (IOException e) {
                 e.printStackTrace();

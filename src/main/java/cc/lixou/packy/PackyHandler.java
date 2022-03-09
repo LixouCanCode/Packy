@@ -15,11 +15,12 @@ public class PackyHandler {
     }
 
     @SneakyThrows
-    public void handle() {
+    public boolean handle() {
         ByteBuffer input = ByteBuffer.allocate(256);
-        channel.read(input);
+        if(channel.read(input) == -1) { return false; }
         String result = new String(input.array()).trim();
         System.out.println(result);
+        return true;
     }
 
 }
