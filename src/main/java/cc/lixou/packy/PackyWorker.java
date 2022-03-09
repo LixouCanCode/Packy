@@ -19,8 +19,9 @@ public class PackyWorker extends Thread {
     private final PackyServer server;
 
     public PackyWorker(PackyServer server) throws IOException {
-        this.server = server;
+        super("PackyServer-Worker-" + server.getWorkerCount().get());
         this.ID = server.getWorkerCount().getAndIncrement();
+        this.server = server;
         this.channels = new HashMap<>();
         this.selector = Selector.open();
     }
